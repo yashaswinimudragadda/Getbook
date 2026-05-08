@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "title": "Java Full Stack",
+    "author": "Vijay Kumar",
+    "img": "http://bpbonline.com/cdn/shop/products/9789389845143.jpg?v=1755670100"  
+    },
+  {
+    "id": 2,
+    "title": "React JS Basics",
+    "author": "Yashaswini",
+    "img": "http://bpbonline.com/cdn/shop/products/9789389845143.jpg?v=1755670100"
+  },
+  {
+    "id": 3,
+    "title": "Python Guide",
+    "author": "Global Tech",
+    "img": "http://bpbonline.com/cdn/shop/products/9789389845143.jpg?v=1755670100"
+  },
+  {
+    "id": 4,
+    "title": "Database Systems",
+    "author": "Oracle Expert",
+    "img": "http://bpbonline.com/cdn/shop/products/9789389845143.jpg?v=1755670100"
+  },
+  {
+    "id": 5,
+    "title": "Telugu Poetry",
+    "author": "Traditional",
+    "img": "http://bpbonline.com/cdn/shop/products/9789389845143.jpg?v=1755670100"
+  }
+]
