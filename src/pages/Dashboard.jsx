@@ -1,26 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'; // Fixed: Removed unused 'React' import
 import { useNavigate } from 'react-router-dom';
 import AddBookModal from '../component/AddBookModal';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('inventory');
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state ఇక్కడ ఉంది
 
-  useEffect(() => {
+  // FIX: Lazy Initialization handles the data retrieval logic during the initial state setup.
+  // This prevents the "cascading render" error by avoiding a setState call inside useEffect.
+  const [user, setUser] = useState(() => {
     const savedData = sessionStorage.getItem("userProfile");
-    if (!savedData) {
-      navigate('/login');
-    } else {
+    if (savedData) {
       const parsedData = JSON.parse(savedData);
+      // Ensure points exist based on current inventory if they aren't already set
       if (parsedData.points === undefined) {
-        parsedData.points = parsedData.books.length * 10;
+        parsedData.points = (parsedData.books ? parsedData.books.length : 0) * 10;
         sessionStorage.setItem("userProfile", JSON.stringify(parsedData));
       }
-      setUser(parsedData);
+      return parsedData;
     }
-  }, [navigate]);
+    return null;
+  });
+
+  const [activeTab, setActiveTab] = useState('inventory');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // This useEffect now only handles navigation/protection logic
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
   const handleLogout = () => {
     if(window.confirm("Are you sure you want to logout?")) {
@@ -58,7 +67,7 @@ const Dashboard = () => {
         {activeTab === 'inventory' ? (
           <InventorySection 
             books={user.books} 
-            setIsModalOpen={setIsModalOpen} // ఇక్కడ పాస్ చేయాలి
+            setIsModalOpen={setIsModalOpen}
             isModalOpen={isModalOpen}
             addNewBook={addNewBook}
           />
@@ -72,7 +81,6 @@ const Dashboard = () => {
 
 // --- SUB-COMPONENTS ---
 
-// 1. Sidebar (మీ కోడ్ లాగే ఉంటుంది)
 const Sidebar = ({ user, activeTab, setActiveTab, handleLogout, navigate }) => (
   <aside style={sidebarStyle}>
     <div style={profileSection}>
@@ -89,7 +97,6 @@ const Sidebar = ({ user, activeTab, setActiveTab, handleLogout, navigate }) => (
   </aside>
 );
 
-// 2. Header
 const DashboardHeader = ({ name, booksCount, points }) => (
   <header style={mainHeader}>
     <div>
@@ -109,7 +116,6 @@ const StatCard = ({ label, value, color }) => (
   </div>
 );
 
-// 3. Inventory Section (ముఖ్యమైన మార్పు ఇక్కడే)
 const InventorySection = ({ books, setIsModalOpen, isModalOpen, addNewBook }) => (
   <section style={fadeIn}>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -117,7 +123,6 @@ const InventorySection = ({ books, setIsModalOpen, isModalOpen, addNewBook }) =>
       <button onClick={() => setIsModalOpen(true)} style={addMoreBtn}>+ Add New Book</button>
     </div>
     
-    {/* మోడల్ ఇక్కడ ఉండాలి */}
     <AddBookModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
@@ -127,7 +132,11 @@ const InventorySection = ({ books, setIsModalOpen, isModalOpen, addNewBook }) =>
     <div style={bookGrid}>
       {books.map((book, index) => (
         <div key={index} style={bookCard}>
-          <img src={book.image} alt={book.title} style={bookImg} />
+          <img 
+             src={book.image.startsWith('/') ? book.image : `/assets/images/${book.image.split('/').pop()}`} 
+             alt={book.title} 
+             style={bookImg} 
+           />
           <div style={{ padding: '12px' }}>
             <h4 style={{ margin: '0 0 5px', fontSize: '15px' }}>{book.title}</h4>
             <span style={tagStyle}>Value: 10 Pts</span>
@@ -138,28 +147,59 @@ const InventorySection = ({ books, setIsModalOpen, isModalOpen, addNewBook }) =>
   </section>
 );
 
-// 4. Requests Section
-const RequestsSection = ({ user }) => {
-  const [requests] = useState([{ id: 1, from: "John Doe", book: user.books[0]?.title || "A Book" }]);
+const RequestsSection = ({ user, setUser }) => {
+  // Using a state for requests to allow for future dynamic updates
+  const [requests] = useState([
+    { 
+      id: 1, 
+      from: "John Doe", 
+      book: user.books && user.books.length > 0 ? user.books[0].title : "A Shared Book" 
+    }
+  ]);
+
+  // Logic to handle "Accepting" an exchange request and updating user points
+  const handleAccept = (requestId) => {
+    console.log("Accepting request ID:", requestId);
+    const updatedUser = { 
+      ...user, 
+      points: (user.points || 0) + 10 
+    };
+
+    // Correctly using the passed setUser prop to update the global user state
+    setUser(updatedUser);
+    sessionStorage.setItem("userProfile", JSON.stringify(updatedUser));
+    alert(`Request Accepted! 10 points added to your balance.`);
+  };
+
   return (
     <section style={fadeIn}>
-      <h3>Exchange Requests</h3>
+      <h3 style={{ borderBottom: '2px solid #3498db', display: 'inline-block', paddingBottom: '5px' }}>
+        Exchange Requests
+      </h3>
+      
       {requests.length > 0 ? (
         requests.map(req => (
           <div key={req.id} style={requestCardStyle}>
-            <p><strong>{req.from}</strong> wants: <strong>{req.book}</strong></p>
-            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-              <button style={acceptBtn}>Accept</button>
+            <p style={{ margin: '0 0 10px 0' }}>
+              <strong>{req.from}</strong> wants to borrow: <span style={{ color: '#2980b9' }}>"{req.book}"</span>
+            </p>
+            
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => handleAccept(req.id)} style={acceptBtn}>
+                Accept (+10 Pts)
+              </button>
               <button style={declineBtn}>Decline</button>
             </div>
           </div>
         ))
-      ) : <p>No requests yet.</p>}
+      ) : (
+        <div>No requests yet.</div>
+      )}
     </section>
   );
 };
 
-// --- మీ పాత STYLES అన్నీ ఇక్కడ అలాగే ఉంచండి ---
+// --- Styles ---
 const fadeIn = { animation: 'fadeIn 0.5s ease-in' };
 const loaderStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '20px' };
 const dashboardLayout = { display: 'flex', minHeight: '100vh', backgroundColor: '#f0f2f5', fontFamily: "'Segoe UI', Roboto, sans-serif" };
