@@ -1,16 +1,78 @@
-# React + Vite
+📚 Book Exchange Portal
+A full-stack web application designed to facilitate book sharing and bartering within a community. Users can list their books, earn points for sharing, and request exchanges with others.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Live Demo: https://getbook-pbog.vercel.app/
 
-Currently, two official plugins are available:
+✨ Features
+Dynamic Registration: New users register by uploading 5 books to earn their initial 50 points.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Inventory Management: Users can add new books to their collection dynamically using Base64 image encoding for persistence.
 
-## React Compiler
+Gamified Exchange: Earn +10 Points for every book added and every exchange request accepted.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Real-time Dashboard: A centralized view for managing your collection, tracking points, and responding to exchange requests.
 
-## Expanding the ESLint configuration
+Responsive UI: Built with modern CSS-in-JS and React functional components for a smooth user experience.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+🛠️ Tech Stack
+Frontend: React.js (Functional Components, Hooks).
+
+Routing: React Router DOM.
+
+State Management: useState, useEffect, and sessionStorage for persistence.
+
+Styling: Inline JavaScript Styles (CSS-in-JS).
+
+Backend (In Transition): Java, Servlets, and Spring MVC.
+
+📂 Folder Structure
+Plaintext
+getbook-portal/
+├── public/                 # Static assets
+│   └── assets/
+│       └── images/         # Hardcoded local images (e.g., logos, icons)
+├── src/                    # Source code
+│   ├── component/          # Reusable UI components
+│   │   ├── AddBookModal.jsx# Modal for adding new books with Base64 upload
+│   │   └── Sidebar.jsx     # Navigation and profile summary
+│   ├── data/
+│   │   └── user.json       # Mock database for existing users
+│   ├── pages/
+│   │   ├── Login.jsx       # Multi-step login and registration logic
+│   │   └── Dashboard.jsx   # Main user interface and request management
+│   ├── App.js              # Root component and route definitions
+│   └── index.js            # Entry point
+├── .gitignore
+├── package.json            # Project dependencies and scripts
+└── README.md
+🚀 Getting Started
+Prerequisites
+Node.js (v14 or higher)
+
+npm or yarn
+
+Installation
+Clone the repository:
+
+Bash
+git clone https://github.com/your-username/getbook-portal.git
+Navigate to the directory:
+
+Bash
+cd getbook-portal
+Install dependencies:
+
+Bash
+npm install
+Start the development server:
+
+Bash
+npm start
+📖 Usage Note on Images
+This project uses a hybrid image loading strategy:
+
+Legacy Data: Images from user.json are served via the public/assets/images folder.
+
+Dynamic Data: Newly added books use Base64 Encoding via the FileReader API to ensure images persist across page refreshes within the sessionStorage.
+
+Developed by: Yashaswini Mudragadda
