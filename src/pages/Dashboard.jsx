@@ -133,9 +133,23 @@ const InventorySection = ({ books, setIsModalOpen, isModalOpen, addNewBook }) =>
       {books.map((book, index) => (
         <div key={index} style={bookCard}>
           <img 
-             src={book.image.startsWith('/') ? book.image : `/assets/images/${book.image.split('/').pop()}`} 
+             src={
+               // 1. Base64 (కొత్త యూజర్ అప్‌లోడ్ చేసినవి) అయితే నేరుగా వాడు
+               book.image.startsWith('data:image') 
+                 ? book.image 
+                 : (
+                     // 2. పాత పాత్ అయితే ఫైల్ పేరును తీసుకుని public ఫోల్డర్ నుండి వెతుకు
+                     book.image.includes('/') 
+                       ? `/assets/images/${book.image.split('/').pop()}` 
+                       : `/assets/images/${book.image}`
+                   )
+             } 
              alt={book.title} 
              style={bookImg} 
+             // 3. ఇమేజ్ లోడ్ అవ్వకపోతే డీఫాల్ట్ ఇమేజ్ చూపిస్తుంది
+             onError={(e) => {
+               e.target.src = "https://via.placeholder.com/150?text=No+Image";
+             }}
            />
           <div style={{ padding: '12px' }}>
             <h4 style={{ margin: '0 0 5px', fontSize: '15px' }}>{book.title}</h4>
@@ -148,27 +162,43 @@ const InventorySection = ({ books, setIsModalOpen, isModalOpen, addNewBook }) =>
 );
 
 const RequestsSection = ({ user, setUser }) => {
-  // Using a state for requests to allow for future dynamic updates
-  const [requests] = useState([
+  // 1. సెట్ రిక్వెస్ట్స్ (setRequests) ని యాడ్ చేసాము
+  const [requests, setRequests] = useState([
     { 
       id: 1, 
       from: "John Doe", 
       book: user.books && user.books.length > 0 ? user.books[0].title : "A Shared Book" 
+    },
+    { 
+      id: 2, 
+      from: "Jane Smith", 
+      book: "React Guide" 
     }
   ]);
 
-  // Logic to handle "Accepting" an exchange request and updating user points
+  // 2. రిక్వెస్ట్ యాక్సెప్ట్ చేసినప్పుడు
   const handleAccept = (requestId) => {
-    console.log("Accepting request ID:", requestId);
+    // పాయింట్లు పెంచడం
     const updatedUser = { 
       ...user, 
       points: (user.points || 0) + 10 
     };
 
-    // Correctly using the passed setUser prop to update the global user state
     setUser(updatedUser);
     sessionStorage.setItem("userProfile", JSON.stringify(updatedUser));
+
+    // లిస్ట్ నుండి ఆ రిక్వెస్ట్‌ను తొలగించడం
+    setRequests(prevRequests => prevRequests.filter(req => req.id !== requestId));
+    
     alert(`Request Accepted! 10 points added to your balance.`);
+  };
+
+  // 3. రిక్వెస్ట్ డిక్లైన్ చేసినప్పుడు
+  const handleDecline = (requestId) => {
+    if (window.confirm("Are you sure you want to decline this request?")) {
+      // పాయింట్లు పెంచకుండా కేవలం లిస్ట్ నుండి తొలగించడం
+      setRequests(prevRequests => prevRequests.filter(req => req.id !== requestId));
+    }
   };
 
   return (
@@ -185,20 +215,30 @@ const RequestsSection = ({ user, setUser }) => {
             </p>
             
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => handleAccept(req.id)} style={acceptBtn}>
+              <button 
+                onClick={() => handleAccept(req.id)} 
+                style={acceptBtn}
+              >
                 Accept (+10 Pts)
               </button>
-              <button style={declineBtn}>Decline</button>
+              
+              <button 
+                onClick={() => handleDecline(req.id)} 
+                style={declineBtn}
+              >
+                Decline
+              </button>
             </div>
           </div>
         ))
       ) : (
-        <div>No requests yet.</div>
+        <div style={{ padding: '20px', color: '#7f8c8d', fontStyle: 'italic' }}>
+          No pending requests at the moment.
+        </div>
       )}
     </section>
   );
 };
-
 // --- Styles ---
 const fadeIn = { animation: 'fadeIn 0.5s ease-in' };
 const loaderStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontSize: '20px' };

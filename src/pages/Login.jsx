@@ -14,6 +14,19 @@ const Login = () => {
 
   const [currentBook, setCurrentBook] = useState({ title: '', image: null });
 
+  // ఫైల్ ని Base64 గా మార్చే ఫంక్షన్
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      // reader.result లో Base64 స్ట్రింగ్ ఉంటుంది
+      setCurrentBook({ ...currentBook, image: reader.result });
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
   const handleUserChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   };
@@ -99,7 +112,7 @@ const Login = () => {
           <input 
             type="file" 
             accept="image/*"
-            onChange={(e) => setCurrentBook({ ...currentBook, image: URL.createObjectURL(e.target.files[0]) })}
+            onChange={handleFileChange}
             style={{ marginTop: '10px' }}
           />
           <button type="button" onClick={addBookToList} disabled={userData.books.length >= 5} style={addBtnStyle}>
