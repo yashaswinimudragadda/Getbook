@@ -1,78 +1,41 @@
-📚 Book Exchange Portal
-A full-stack web application designed to facilitate book sharing and bartering within a community. Users can list their books, earn points for sharing, and request exchanges with others.
+# 📚 GetBook - Book Bartering Platform
 
-Live Demo: https://getbook-pbog.vercel.app/
+**GetBook** is a modern web application designed for users to share books they own with others in exchange for reward points. It encourages community-based book swapping and makes reading more accessible.
 
-✨ Features
-Dynamic Registration: New users register by uploading 5 books to earn their initial 50 points.
+**🔗 Live Demo:** [https://getbook-pbog.vercel.app/](https://getbook-pbog.vercel.app/)
 
-Inventory Management: Users can add new books to their collection dynamically using Base64 image encoding for persistence.
+---
 
-Gamified Exchange: Earn +10 Points for every book added and every exchange request accepted.
+## 🚀 Features
 
-Real-time Dashboard: A centralized view for managing your collection, tracking points, and responding to exchange requests.
+* **User Registration & Login:** New users can register by uploading 5 books, earning an initial 50 points.
+* **Dynamic Dashboard:** View user profile details, book inventory, and point balances in real-time.
+* **Inventory Management:** Users can dynamically add new books to their collection. Each successful upload grants +10 points.
+* **Exchange Requests:** A dedicated section to 'Accept' or 'Decline' incoming book requests from other users.
+* **Base64 Image Processing:** Uses Base64 encoding to handle user-uploaded images, ensuring they persist within the browser session without a backend.
+* **Responsive UI:** A clean, modern interface built for a seamless experience across mobile and desktop devices.
 
-Responsive UI: Built with modern CSS-in-JS and React functional components for a smooth user experience.
+---
 
-🛠️ Tech Stack
-Frontend: React.js (Functional Components, Hooks).
+## 📁 Folder Structure
 
-Routing: React Router DOM.
+The project is organized to separate concerns between data, UI components, and page logic:
 
-State Management: useState, useEffect, and sessionStorage for persistence.
-
-Styling: Inline JavaScript Styles (CSS-in-JS).
-
-Backend (In Transition): Java, Servlets, and Spring MVC.
-
-📂 Folder Structure
-Plaintext
-getbook-portal/
+```text
+getbook/
 ├── public/                 # Static assets
 │   └── assets/
-│       └── images/         # Hardcoded local images (e.g., logos, icons)
-├── src/                    # Source code
+│       └── images/         # Default book covers and system icons
+├── src/                    # Main source code
 │   ├── component/          # Reusable UI components
-│   │   ├── AddBookModal.jsx# Modal for adding new books with Base64 upload
-│   │   └── Sidebar.jsx     # Navigation and profile summary
-│   ├── data/
-│   │   └── user.json       # Mock database for existing users
-│   ├── pages/
-│   │   ├── Login.jsx       # Multi-step login and registration logic
-│   │   └── Dashboard.jsx   # Main user interface and request management
-│   ├── App.js              # Root component and route definitions
-│   └── index.js            # Entry point
-├── .gitignore
+│   │   ├── AddBookModal.jsx # Logic for adding new books via popup
+│   │   └── Navbar.jsx      # Navigation controls
+│   ├── data/               # Mock data files
+│   │   └── user.json       # Initial database of registered users
+│   ├── pages/              # Primary application views
+│   │   ├── Login.jsx       # Registration and login flow
+│   │   └── Dashboard.jsx   # User inventory and request management
+│   ├── App.js              # Main routing and entry point
+│   └── index.js            # React DOM rendering file
 ├── package.json            # Project dependencies and scripts
-└── README.md
-🚀 Getting Started
-Prerequisites
-Node.js (v14 or higher)
-
-npm or yarn
-
-Installation
-Clone the repository:
-
-Bash
-git clone https://github.com/your-username/getbook-portal.git
-Navigate to the directory:
-
-Bash
-cd getbook-portal
-Install dependencies:
-
-Bash
-npm install
-Start the development server:
-
-Bash
-npm start
-📖 Usage Note on Images
-This project uses a hybrid image loading strategy:
-
-Legacy Data: Images from user.json are served via the public/assets/images folder.
-
-Dynamic Data: Newly added books use Base64 Encoding via the FileReader API to ensure images persist across page refreshes within the sessionStorage.
-
-Developed by: Yashaswini Mudragadda
+└── README.md               # Project documentation
